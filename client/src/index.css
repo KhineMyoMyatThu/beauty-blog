@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import url("https://googleapis.com");
+
+body {
+  margin: 0;
+}
+
+@theme {
+  --font-title: "Roboto Slab", serif;
+}
