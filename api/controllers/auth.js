@@ -1,41 +1,59 @@
-import {db} from '../db.js'
-import bcrypt from 'bcryptjs'
 
+import prisma from "../config/db.js";
+import bcrypt from "bcryptjs";
 
-export const register = (req,res) => {
+// REGISTER
+export const register = async (req, res) => {
+  try {
+    // 1. Get data from the registration form
+    const { username, email, password } = req.body;
 
-    //check existing user
-    const q = 'SELECT * FROM users WHERE email = ? OR username = ?'
-
-    db.query(q, [req.body.email, req.body.username], (err, data) => {
-        if(err) return res.json(err);
-        if(data.length) return res.status(409).json('User Already Exits!');
-
-        //Hashed Password created a user
-        const saltRounds = 10;
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hash = bcrypt.hashSync(req.body.password, salt);
-
-        //after we get input data, we add these data to the DB
-        const q = 'INSERT INTO users(`username` ,`email` , `password`) VALUE(?)'
-        const values = [
-            req.body.username,
-            req.body.email,
-            hash //req.body.password
+    // 2. Check whether this username or email already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: username },
+          { email: email }
         ]
-
-        db.query(q, [values] , (err,data) => {
-            if(err)  return res.json(err);
-            return res.status(200).json('User has been created.');
-        });
+      }
     });
 
-}
+    // 3. Stop if the user already exists
+    if (existingUser) {
+      return res.status(409).json("User already exists!");
+    }
 
-export const login = (req, res) =>{
+    // 4. Encrypt the password before saving it
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-}
+    // 5. Save the new user in the database
+    await prisma.user.create({
+      data: {
+        username: username,
+        email: email,
+        password: hashedPassword
+      }
+    });
 
-export const logout = (req,res) => {
-    
-}
+    // 6. Send a success message
+    return res.status(201).json("User has been created!");
+
+  } catch (error) {
+    // Show the error in the backend terminal
+    console.error("Register error:", error);
+
+    return res.status(500).json("Registration failed!");
+  }
+};
+
+
+// LOGIN (we will implement this later)
+export const login = async (req, res) => {
+  return res.status(501).json("Login is not implemented yet.");
+};
+
+
+// LOGOUT (we will implement this later)
+export const logout = (req, res) => {
+  return res.status(200).json("Logged out!");
+};
