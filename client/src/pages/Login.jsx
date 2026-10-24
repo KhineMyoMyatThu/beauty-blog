@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
     const [inputs, setInputs] = useState({
@@ -37,10 +40,11 @@ const Login = () => {
         {/* Form */}
         <form className="space-y-5">
 
-          {/* Username */}
+           {/* Email */}
           <div>
-            <input 
-              required type="text"  placeholder="username" name="username" onChange={handleChange}   className="  w-full border-b border-gray-400 outline-none text-sm py-2 placeholder-gray-400 focus:border-pink-500 "/>
+            <input required type="email" placeholder="youremail@example.com" name = 'email'  onChange={handleChange} className=" w-full border-b border-gray-40 outline-none text-sm py-2 placeholder-gray-400 focus:border-[#087f83]
+              "
+            />
           </div>
 
           {/* Password */}
@@ -50,7 +54,7 @@ const Login = () => {
 
 
           {/* Button */}
-          <button type="submit" className="w-full bg-pink-500 text-white text-sm py-2 hover:bg-pink-600 transition " onclick={handleSubmit}>
+          <button type="submit" className="w-full bg-pink-500 text-white text-sm py-2 hover:bg-pink-600 transition " onClick={handleSubmit}>
             Login
           </button>
 
