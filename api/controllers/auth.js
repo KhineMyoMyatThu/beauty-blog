@@ -49,7 +49,32 @@ export const register = async (req, res) => {
 
 // LOGIN (we will implement this later)
 export const login = async (req, res) => {
-  return res.status(501).json("Login is not implemented yet.");
+
+  try{
+    //get data from the login form
+  const {email, password} = req.body;
+
+  // fetch user from the database
+  const user = await prisma.user.findUnique({
+    where: {
+      email : email
+    }
+  });
+  
+ if(user && await bcrypt.compare(password, user.password)){
+  return res.status(200).json("Login successful!");
+
+ }else {
+  return res.status(401).json("Invalid email or password!");
+ }
+
+  }catch(err){
+    console.error("Login error:", err);
+    return res.status(500).json("Login failed!");
+  }
+ 
+
+
 };
 
 
