@@ -1,6 +1,7 @@
 
 import prisma from "../config/db.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 // REGISTER
 export const register = async (req, res) => {
@@ -60,13 +61,22 @@ export const login = async (req, res) => {
       email : email
     }
   });
-  
- if(user && await bcrypt.compare(password, user.password)){
-  return res.status(200).json("Login successful!");
 
- }else {
-  return res.status(401).json("Invalid email or password!");
- }
+  // Check email
+    if (!user) {
+      return res.status(404).json("Email not found!");
+    }
+
+
+  //check password
+  const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+  
+  if(!isPasswordCorrect) {
+    return res.status(400).json("Wrong password");
+
+    const 
+  }
+ 
 
   }catch(err){
     console.error("Login error:", err);
