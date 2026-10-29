@@ -48,49 +48,54 @@ export const register = async (req, res) => {
 };
 
 
-// LOGIN (we will implement this later)
+// login
 export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
-  try{
-    //get data from the login form
-  const {email, password} = req.body;
 
-  // fetch user from the database
-  const user = await prisma.user.findUnique({
-    where: {
-      email : email
-    }
-  });
-
-  // Check email
+    //check if user exists
     if (!user) {
       return res.status(404).json("Email not found!");
     }
-
-
-  //check password
-  const isPasswordCorrect = bcrypt.compareSync(password, user.password);
   
-  if(!isPasswordCorrect) {
-    res.status(400).json("Wrong password");
+    // Compare the provided password with the hashed password in the database
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.password
+    );
 
-    const token = jwt.sign({id: user.id}, "jwtkey");
-    const {password, ...other} = user;
-    res.cookie("access_token", token, {
-      httpOnly:true
-    }).status(200).json(other);
+    //check if the password is correct
+    if (!isPasswordCorrect) {
+      return res.status(400).json("Wrong password");
+    }
 
-  }
- 
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-  }catch(err){
+    const { password: _password, ...userWithoutPassword } = user;
+
+    return res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      })
+      .status(200)
+      .json(userWithoutPassword);
+
+  } catch (err) {
     console.error("Login error:", err);
     return res.status(500).json("Login failed!");
   }
- 
-
-
 };
+
 
 
 // LOGOUT (we will implement this later)
