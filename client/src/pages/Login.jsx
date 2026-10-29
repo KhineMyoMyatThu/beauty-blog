@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 const Login = () => {
     const [inputs, setInputs] = useState({
-    username : "",
+    email : "",
     password: ""
   })
 
@@ -18,13 +19,20 @@ const Login = () => {
     setInputs(prev =>({...prev,[e.target.name] : e.target.value}))
   }
 
+
   const handleSubmit = async e => {
     e.preventDefault() ;//ser agent that the event is being explicitly handled, so its default action, such as page scrolling, link navigation, or pasting text, should not be taken.
     try{
-      await axios.post("/api/auth/login", inputs);
+     await axios.post(
+      "/api/auth/login",
+      inputs,
+      { withCredentials: true }
+    );
+
       navigate("/");  //redirects the user to the home page after a successful login.
+    
     }catch(err){
-      setError(err.response.data)
+      setError(err.response?.data || err.message || "Login failed");
     }
    
   }
@@ -38,7 +46,7 @@ const Login = () => {
         </h2>
 
         {/* Form */}
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
 
            {/* Email */}
           <div>
@@ -54,7 +62,7 @@ const Login = () => {
 
 
           {/* Button */}
-          <button type="submit" className="w-full bg-pink-500 text-white text-sm py-2 hover:bg-pink-600 transition " onClick={handleSubmit}>
+          <button type="submit" className="w-full bg-pink-500 text-white text-sm py-2 hover:bg-pink-600 transition ">
             Login
           </button>
 
