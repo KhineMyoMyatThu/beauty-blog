@@ -11,9 +11,9 @@ const Login = () => {
     password: ""
   })
 
-  const [err, setError] = useState(null)
+  const [err, setError] = useState(null);
 
-  const navigate = useNavigate() ;//useNavigate is a hook that allows you to programmatically navigate to different routes in your application. It is part of the React Router library and is commonly used in React applications for handling navigation between different pages or components.
+  const navigate = useNavigate() ;//useNavigate is a hook that allows you to programmatically navigate to different routes in your application. It is part of the React Router library
 
   const handleChange = e => {
     setInputs(prev =>({...prev,[e.target.name] : e.target.value}))
