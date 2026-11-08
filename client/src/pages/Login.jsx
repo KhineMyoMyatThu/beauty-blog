@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/authContext.jsx';
+
 
 
 const Login = () => {
@@ -15,6 +17,7 @@ const Login = () => {
 
   const navigate = useNavigate() ;//useNavigate is a hook that allows you to programmatically navigate to different routes in your application. It is part of the React Router library
 
+  const  { login } = useContext(AuthContext);
   const handleChange = e => {
     setInputs(prev =>({...prev,[e.target.name] : e.target.value}))
   }
@@ -23,13 +26,8 @@ const Login = () => {
   const handleSubmit = async e => {
     e.preventDefault() ;//ser agent that the event is being explicitly handled, so its default action, such as page scrolling, link navigation, or pasting text, should not be taken.
     try{
-     await axios.post(
-      "/api/auth/login",
-      inputs,
-      { withCredentials: true }
-    );
-
-      navigate("/");  //redirects the user to the home page after a successful login.
+     await login(inputs);
+     navigate("/");  //redirects the user to the home page after a successful login.
     
     }catch(err){
       setError(err.response?.data || err.message || "Login failed");
@@ -85,3 +83,4 @@ const Login = () => {
 };
 
 export default Login;
+
